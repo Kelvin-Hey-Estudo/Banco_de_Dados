@@ -1,0 +1,161 @@
+Exercícios
+
+I - Responda as seguintes questões:
+
+a) Qual a utilidade de Agregação?
+R: A agregação pode ser usada para desfazer redundâncias no diagrama ER, como quando uma entidade especializada possui os mesmos atributos de sua entidade pai.
+
+b) Quando devemos utilizar especialização?
+R: Quando uma entidade pode ter características específicas, por exemplo: a entidade funcionário pode ser epecializada em cargo, como engenheiro, médico e etc.
+
+c) Em que situações devemos optar por uma generalização ao invés de uma especialização?
+R: Quando a entidade for demasiada simples ou quando o responsável pela Diagrama ER perceber que pode gerar redundância especializar a entidade
+
+II - Elabore o script, de todos os comandos abordados em aula
+R:
+
+use database clube_do_livro;
+ 
+-- Quais os livros cadastrados?
+ 
+select * from livros;
+ 
+-- Qual o nome dos alunos que fazem parte do Clube do Livro?
+select aluno.nome from aluno;
+ 
+-- Qual a cidade da aluno Emily?
+select aluno.cidade from aluno
+where aluno.nome='Emily';
+ 
+-- Quais os empréstimos do aluno com matr_aluno = 100?
+select * from emprestimo
+where emprestimo.cod_aluno=100;
+ 
+-- Qual aluno doou o livro Projeto de Banco de Dados?
+select livro.nome_aluno from aluno, livro
+where livro.nome_livro="Projeto de Banco de Dados"
+and aluno.matr_aluno=livro.matr_aluno;
+ 
+-- Quais alunos emprestaram o livro Projeto de Banco de Dados?
+select aluno.nome_aluno from aluno, livro, emprestimo
+where livro.nome_livro='Projeto de Banco de Dados'
+ 
+and livro_cod_livro=emprestimo.cod_livro
+and aluno.matr_aluno=emprestimo.cod_aluno
+ 
+-- Quais os alunos cujo nome começam com a letra E
+select aluno.nome_aluno from aluno
+where aluno.nome_aluno like 'E%';
+ 
+-- Quais os alunos cujo nome possuem a letra E
+select aluno.nome_aluno from aluno
+where aluno.nome_aluno like 'E%';
+ 
+-- Apresente os valore em ordem decrescente
+select livro.nome_livro from livro
+order by livro.nome_livro desc;
+ 
+-- Apresente os valore em ordem crescente
+select livro.nome_livro from livro
+order by livro.nome_livro asc;
+ 
+-- Quantos alunos temos no Clube do Livro
+select count(aluno.matr_aluno) from aluno;
+ 
+-- Quantos livros são de Literatura
+select count(livro.cod_livro) from livro, area
+where area.nome_area='Literatura'
+and livro.cod_area=area.cod_area;
+
+III - Elabore um script para as seguintes questões das seguintes perguntas utilizando a base de dados do Clube do Livro
+
+a) Quais as áreas cadastradas?
+R:  select * from area;
+
+b) Quantos Livros são da área de Banco de dados?
+R: select count(nome_livro) from livro where cod_livro=1;
+
+c) Apresente as áreas dos livros em ordem decrescente?
+R: select livro.area from livro order by desc;
+
+d) Quais os livros cadastrados que possuem a string "to" no nome?
+R: select * from livro where livro.nome_livro like '%to%';
+
+e) A qual área pertence o livro Projeto de Banco de Dados?
+R: select livro.cod_area from livro where nome_livro='Projeto de Banco de Dados';
+
+f) Quais alunos doaram livros na área de Literatura
+R: select count(livro.matr_aluno) from livro, aluno 
+  where livro.cod_area=4 
+  and aluno.matr_aluno=livro.matr_aluno;
+
+g) Atualize a área Literatura, para Literatura Contemporânea
+R: update area 
+  set nome_area='Literatura Contemporânea' 
+  where cod_area=4;
+
+h) Apague o último registro da tabela livro
+R: delete from livro where cod_livro=15;
+
+IV - Crie um script de Implementação do modelo Relacional a seguir, que será utilizado para a próxima aula:
+
+create database loja_generica;
+ 
+use loja_generica;
+ 
+create table cliente(
+ nome_cliente varchar(100),
+ cod_cliente int,
+ CPF_cliente varchar(11),
+ data_cadastro date,
+ cidade_cliente varchar(50),
+ UF_cliente varchar(2),
+  constraint un_CPF_cliente unique(CPF_cliente),
+ constraint pk_cliente primary key(cod_cliente)
+);
+ 
+create table categoria(
+ cod_categoria int,
+ nome_categoria varchar(20),
+  constraint un_nome_categoria unique(nome_categoria),
+ constraint pk_cod_categoria primary key(cod_categoria)
+);
+ 
+create table classe(
+ cod_classe int,
+ nome_classe varchar(20),
+ preco_classe float,
+ 
+ constraint primary key(cod_classe)
+);
+ 
+create table titulo(
+ cod_titulo int,
+ nome_titulo varchar(50),
+ ano decimal(4),
+ cod_categoria int,
+ cod_classe int,
+ constraint pk_cod_titulo primary key(cod_titulo),
+ constraint fk_cod_categoria foreign key(cod_categoria) references categoria(cod_categoria),
+ constraint fk_cod_classe foreign key(cod_classe) references classe(cod_classe)
+);
+ 
+create table filme(
+   cod_filme int,
+   cod_titulo int,
+   nome_distribuidor varchar(20),
+   constraint fk_cod_filme primary key(cod_filme),
+   constraint fk_cod_titulo foreign key(cod_titulo) references titulo(cod_titulo)
+);
+ 
+create table emprestimo_devolucao(
+   cod_cliente int,
+   cod_filme int,
+   data_emprestimo date,
+   data_devolucao_prevista date,
+   data_devolucao_efetiva date,
+   valor_multa float,
+   constraint fk_cod_cliente foreign key(cod_cliente) references cliente(cod_cliente),
+   constraint fk_cod_filme foreign key(cod_filme) references filme(cod_filme)
+);
+ 
